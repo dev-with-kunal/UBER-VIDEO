@@ -1,17 +1,27 @@
-import React ,{useState} from 'react';
-import { Link } from 'react-router-dom';
+import React ,{useState,useContext} from 'react';
+import { Link,useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import {userDataContext} from '../context/UserContext';
 const UserSignup = () => {
-    const handleSubmit = (e) => {
+    const navigate = useNavigate();
+    const {user,setUser} = useContext(userDataContext);
+    const handleSubmit = async(e) => {
         e.preventDefault();
-        setUserData({
-            fullName:{
-                firstName: firstName,
-                lastName: lastName
+        const newUser = {
+            fullname:{
+                firstname: firstName,
+                lastname: lastName
             },
             email: email,
             password: password
-        });
-        console.log(userData);
+        }
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`,newUser);
+        if(response.status === 201){
+            localStorage.setItem('token',response.data.token);
+            const data = response.data;
+            setUser(data.User);
+            navigate('/home');
+        }
         setEmail('');
         setPassword('');
         setFirstName('');   
@@ -41,7 +51,7 @@ const UserSignup = () => {
                     <h3 className='text-lg font-medium mb-2'>Password</h3>
                     <input className="w-full bg-[#eeeeee] px-4 py-2 border rounded text-lg placeholder:text-base mb-6" type="password" required placeholder='Password'  value={password} onChange={(e)=>{setPassword(e.target.value);}}/>
 
-                    <button className='w-full bg-[#111] text-white font-semibold px-4 py-2 rounded text-xl mb-3'>Login</button>
+                    <button className='w-full bg-[#111] text-white font-semibold px-4 py-2 rounded text-xl mb-3'>Create Account</button>
                     <p className='text-center'> Already have an Account ?<Link to="/login" className='text-blue-700'> Login here</Link> </p>
                 </form>
             </div>
